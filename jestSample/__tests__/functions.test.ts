@@ -1,5 +1,6 @@
 import { sumOfArray } from "../functions";
 import { asyncSumOfArray } from "../functions";
+import { DatabaseMock } from "../util";
 import { asyncSumOfArraySometimesZero } from "../functions";
 
 describe("sumOfArray", (): void => {
@@ -58,5 +59,15 @@ describe("asyncSumOfArraySometimesZero", (): void => {
     }
   );
 
-  // DatabaseMock.save() が例外を投げるテストケース？
+  // DatabaseMock.save() が例外を投げるテストケース
+  test("DatabaseMock.save() throwing results to be 0", (): Promise<void> => {
+    const mockSave = DatabaseMock.prototype.save as jest.MockedFunction<
+      typeof DatabaseMock.prototype.save
+    >;
+    mockSave.mockImplementation((): void => {
+      throw new Error("fail!");
+    });
+
+    return expect(asyncSumOfArraySometimesZero([7])).resolves.toBe(0);
+  });
 });
